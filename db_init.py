@@ -4,14 +4,17 @@ from mysql.connector import Error, errorcode
 import os
 from dotenv import load_dotenv
 
+
 load_dotenv()
+
+
 DB_NAME = os.getenv("DB_NAME")
 
 DB_CONFIG = {
     'host': os.getenv("DB_HOST"),
     'user': os.getenv("DB_USER"),
     'password': os.getenv("DB_PASSWORD"),
-    'port': os.getenv("DB_PORT"),
+    'port': int(os.getenv("DB_PORT")),
     'raise_on_warnings': True,
 }
 TABLES = {}
@@ -46,9 +49,9 @@ TABLES['ARTICULOS'] = (
     "  `descripcion` varchar(150) NOT NULL,"
     " `precio` decimal(10,2) NOT NULL,"
     "  `stock` int(11) NOT NULL,"
-    "  PRIMARY KEY (`id`),"
     "  `marca_id` int(11) NOT NULL,"
     "  `proveedor_id` int(11) NOT NULL,"
+    "  PRIMARY KEY (`id`),"
     " foreign key (`marca_id`) references MARCAS(id),"
     " foreign key (`proveedor_id`) references PROVEEDORES(id)"
     ") "
@@ -199,10 +202,11 @@ def seeds_tables(seed, cursor):
 
 cxn = mysql.connector.connect(**DB_CONFIG)
 cursor = cxn.cursor()
+create_database(cursor)
 cursor.close()
 cxn.close()
 
-create_database(cursor)
+
 CONF_DB = DB_CONFIG.copy()
 CONF_DB['database'] = DB_NAME
 cxn = mysql.connector.connect(**CONF_DB)
@@ -212,3 +216,4 @@ seeds_tables(SEEDS, cursor)
 cxn.commit()
 cursor.close()
 cxn.close()
+
